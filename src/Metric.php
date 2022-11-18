@@ -61,10 +61,10 @@ final class Metric {
 	 */
 	public function __construct(array $labels = []) {
 		// Add default labels first
-		$os_name = php_uname('s');
-		$labels[] = ['name' => 'os_name', 'value' => $os_name];
-		$labels[] = ['name' => 'machine_type', 'value' => php_uname('m')];
-		$labels[] = ['name' => 'machine_id', 'value' => static::getMachineId($os_name)];
+		$osName = php_uname('s');
+		$labels['os_name'] = $osName;
+		$labels['machine_type'] = php_uname('m');
+		$labels['machine_id'] = static::getMachineId($osName);
 
 		// And finally add all labels
 		$this->addLabelList($labels);
@@ -183,17 +183,22 @@ final class Metric {
 	/**
 	 * Helper to get machine id by operating system name
 	 *
-	 * @param string $os_name
-	 * @param string
-	 *  Default is unknown
+	 * @param string $osName
+	 * @return string Default is unknown
 	 */
-	protected static function getMachineId(string $os_name): string {
-		return match ($os_name) {
+	protected static function getMachineId(string $osName): string {
+		return match ($osName) {
 			'Darwin' => exec('oreg -rd1 -c IOPlatformExpertDevice'),
-			'Linux', 'Unix' => exec('( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname ) | head -n 1 || :'),
-			'FreeBSD', 'NetBSD', 'OpenBSD' => exec('kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'),
-			'WINNT', 'WIN32', 'Windows' => exec('%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid'),
-			default => 'unknown',
-		};
+			'Linux', 'Unix' => exec(
+				'( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname ) | head -n 1 || :'
+			),
+			'FreeBSD', 'NetBSD', 'OpenBSD' => exec(
+				'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
+			),
+			'WINNT', 'WIN32', 'Windows' => exec(
+				'%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid'
+			),
+			default => null,
+		} ?: 'unknown';
 	}
 }
