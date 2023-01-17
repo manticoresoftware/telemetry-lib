@@ -130,13 +130,12 @@ final class Metric {
 	 * @return bool
 	 */
 	public function send(): bool {
-		$groups = [];
+		$body = '';
 		/** @var CounterCollection $collection */
-		foreach ($this->metrics as $collection) {
-			$groups[] = $collection->getMetricsString();
+		foreach ($this->metrics as $k => $collection) {
+			$body .= $collection->getMetricsString() . PHP_EOL;
+			unset($this->metrics[$k]);
 		}
-
-		$body = implode(PHP_EOL, $groups);
 
 		return $this->process($body);
 	}
