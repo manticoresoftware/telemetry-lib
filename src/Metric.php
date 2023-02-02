@@ -190,7 +190,7 @@ final class Metric {
 		return hash(
 			'sha256',
 			'manticore:' . (match ($osName) {
-				'Darwin' => exec('oreg -rd1 -c IOPlatformExpertDevice'),
+				'Darwin' => exec('ioreg -rd1 -c IOPlatformExpertDevice'),
 				'Linux', 'Unix' => exec(
 					'( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname ) | head -n 1 || :'
 				),
