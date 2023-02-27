@@ -65,7 +65,8 @@ final class Metric {
 		$labels['os_name'] = $osName;
 		$labels['machine_type'] = php_uname('m');
 		$labels['machine_id'] = static::getMachineId($osName);
-
+		$labels['dockerized'] = static::isDockerized();
+		$lables['official_docker'] = static::isOfficialDocker();
 		// And finally add all labels
 		$this->addLabelList($labels);
 	}
@@ -203,5 +204,30 @@ final class Metric {
 				default => null,
 			} ?: 'unknown')
 		);
+	}
+
+	/**
+	 * Get information if we run inside container or not
+	 * It can return one of: unknown, yes, no
+	 * @return string
+	 */
+	protected static function isDockerized(): string {
+		// If there is no such path, probably we are not on linux
+		// That means we are not inside container also
+		if (!file_exists('/proc/1/sched')) {
+			return 'unknown';
+		}
+
+		$resultCode = 0;
+		exec("awk '{exit (\$1 ~ /^init|systemd$/)}' /proc/1/sched", result_code: $resultCode);
+		return $resultCode === 0 ? 'yes' : 'no';
+	}
+
+	/**
+	 * Detect if we are running inside official docker image
+	 */
+	protected static function isOfficialDocker(): string {
+		$daemonUrl = getenv('DAEMON_URL') ?: '';
+		return str_contains($daemonUrl, 'manticore') ? 'yes' : 'no';
 	}
 }
