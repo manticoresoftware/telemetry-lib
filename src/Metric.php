@@ -67,6 +67,7 @@ final class Metric {
 		$labels['machine_id'] = static::getMachineId($osName);
 		$labels['dockerized'] = static::isDockerized();
 		$lables['official_docker'] = static::isOfficialDocker();
+		$labels['arch'] = static::getArchitecture();
 		// And finally add all labels
 		$this->addLabelList($labels);
 	}
@@ -225,9 +226,30 @@ final class Metric {
 
 	/**
 	 * Detect if we are running inside official docker image
+	 * @return string
 	 */
 	protected static function isOfficialDocker(): string {
 		$daemonUrl = getenv('DAEMON_URL') ?: '';
 		return str_contains($daemonUrl, 'manticore') ? 'yes' : 'no';
+	}
+
+	/**
+	 * Get current machine architecture. In case if we fail
+	 * @return string
+	 */
+	protected static function getArchitecture(): string {
+		$uname = php_uname('m');
+		$arch = 'unknown';
+
+		if (stripos($uname, 'x86_64') !== false
+			|| stripos($uname, 'amd64') !== false
+			|| stripos($uname, 'x64') !== false
+		) {
+			$arch = 'amd';
+		} elseif (stripos($uname, 'arm') !== false) {
+			$arch = 'arm';
+		}
+
+		return $arch;
 	}
 }
