@@ -194,7 +194,7 @@ final class Metric {
 			'manticore:' . (match ($osName) {
 				'Darwin' => exec('ioreg -rd1 -c IOPlatformExpertDevice'),
 				'Linux', 'Unix' => exec(
-					'( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname ) | head -n 1 || :'
+					'( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname || cat /etc/hostname ) | head -n 1 || :'
 				),
 				'FreeBSD', 'NetBSD', 'OpenBSD' => exec(
 					'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
