@@ -35,7 +35,7 @@
 	<rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses"/>
-	<rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/>
+	<!-- <rule ref="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/> -->
 	<rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
 	<rule ref="Squiz.Strings.DoubleQuoteUsage.NotRequired"/>
 		<rule ref="SlevomatCodingStandard.Complexity.Cognitive">
@@ -64,33 +64,28 @@
 			<property name="requiredSpacesBeforeClose" value="0"/>
 		</properties>
 	</rule>
-	<rule ref="Generic.Arrays.ArrayIndent">
-		<properties>
-			<property name="tabIdent" value="true"/>
-		</properties>
-	</rule>
 
 	<rule ref="Generic.WhiteSpace.ScopeIndent">
 		<properties>
-			<property name="tabIdent" value="true"/>
+			<property name="tabIndent" value="true"/>
 		</properties>
 	</rule>
 
 	<rule ref="PSR2.Classes.ClassDeclaration">
 		<properties>
-			<property name="tabIdent" value="true"/>
+			<property name="tabIndent" value="true"/>
 		</properties>
 	</rule>
 
 	<rule ref="PSR2.ControlStructures.SwitchDeclaration">
 		<properties>
-			<property name="tabIdent" value="true"/>
+			<property name="tabIndent" value="true"/>
 		</properties>
 	</rule>
 
 	<rule ref="PSR2.Methods.FunctionCallSignature">
 		<properties>
-			<property name="tabIdent" value="true"/>
+			<property name="tabIndent" value="true"/>
 			<property name="requiredSpacesAfterOpen" value="1"/>
 			<property name="requiredSpacesBeforeClose" value="1"/>
 		</properties>
@@ -161,5 +156,7 @@
 			<property name="requiredSpacesBeforeColon" value="0" />
 		</properties>
 	</rule>
-	<rule ref="Squiz.NamingConventions.ValidVariableName"/>
+	<rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
+	<rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
+	<rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>
 </ruleset>

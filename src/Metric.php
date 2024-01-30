@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
 /*
-  Copyright (c) 2022, Manticore Software LTD (https://manticoresearch.com)
+	Copyright (c) 2022, Manticore Software LTD (https://manticoresearch.com)
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License version 2 or any later
-  version. You should have received a copy of the GPL license along with this
-  program; if you did not, you can find it at http://www.gnu.org/
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License version 2 or any later
+	version. You should have received a copy of the GPL license along with this
+	program; if you did not, you can find it at http://www.gnu.org/
 */
 
 namespace Manticoresoftware\Telemetry;
@@ -62,7 +62,10 @@ final class Metric {
 	public function __construct(array $labels = []) {
 		// Add default labels first
 		$osName = php_uname('s');
+		$osRelease = static::parseOsReleaseFile();
 		$labels['os_name'] = $osName;
+		$lables['os_release_name'] = $osRelease['name'] ?? 'unknown';
+		$lables['os_release_version'] = $osRelease['version'] ?? 'unknown';
 		$labels['machine_type'] = php_uname('m');
 		$labels['machine_id'] = static::getMachineId($osName);
 		$labels['dockerized'] = static::isDockerized();
@@ -160,7 +163,7 @@ final class Metric {
 				'method'  => 'POST',
 				'header'  => "Content-Encoding: gzip\n"
 					. "Content-Type: application/x-www-form-urlencoded\n"
-		  . 'Content-Length: '. strlen($content),
+			. 'Content-Length: '. strlen($content),
 				'content' => $content,
 				'ignore_errors' => false,
 				'timeout' => static::REQUEST_TIMEOUT,
@@ -194,7 +197,9 @@ final class Metric {
 			'manticore:' . (match ($osName) {
 				'Darwin' => exec('ioreg -rd1 -c IOPlatformExpertDevice'),
 				'Linux', 'Unix' => exec(
-					'( cat /var/lib/dbus/machine-id /etc/machine-id /etc/hostname 2> /dev/null || hostname 2> /dev/null ) | head -n 1 || :'
+					'( cat /var/lib/dbus/machine-id /etc/machine-id /etc/hostname '
+					. '2> /dev/null || hostname 2> /dev/null )'
+					. ' | head -n 1 || :'
 				),
 				'FreeBSD', 'NetBSD', 'OpenBSD' => exec(
 					'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
@@ -251,5 +256,35 @@ final class Metric {
 		}
 
 		return $arch;
+	}
+
+	/**
+	 * Parse the release file if presents and return info
+	 * @return array<string,string>
+	 */
+	protected static function parseOsReleaseFile(): array {
+		$filename = '/etc/os-release';
+
+		if (!file_exists($filename) || !is_readable($filename)) {
+			return [];
+		}
+
+		// Read the file into an array of lines
+		$lines = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		if (!$lines) {
+			return [];
+		}
+
+		// Initialize an associative array to hold the variables
+		$osInfo = [];
+		foreach ($lines as $line) {
+			if (false === strpos($line, '=')) {
+				continue;
+			}
+			[$key, $value] = explode('=', $line, 2);
+			$osInfo[strtolower($key)] = trim($value, '"');
+		}
+
+		return $osInfo;
 	}
 }
