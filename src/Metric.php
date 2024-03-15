@@ -101,6 +101,46 @@ final class Metric {
 	}
 
 	/**
+	 * Method to reset labels to reassign it
+	 * @return static
+	 */
+	public function resetLabels(): static {
+		$this->labels = [];
+		return $this;
+	}
+
+	/**
+	 * Helper to update current set lables
+	 * @param  array<string,string>  $labels
+	 * @return static
+	 */
+	public function updateLabels(array $labels): static {
+		// 1. Clean up labels with the same name
+		foreach ($this->labels as $idx => $label) {
+			if (!isset($labels[$label->getName()])) {
+				continue;
+			}
+
+			unset($this->labels[$idx]);
+		}
+
+		// Keep list without empty indexes
+		$this->labels = array_values($this->labels);
+
+		// 2. Add labels with new values to end of th elist
+		$this->addLabelList($labels);
+		return $this;
+	}
+
+	/**
+	 * Return all set lables
+	 * @return array<int,Label>
+	 */
+	public function getLabels(): array {
+		return $this->labels;
+	}
+
+	/**
 	 * Register a metric that will be send on calling send method
 	 *
 	 * @param string $name
