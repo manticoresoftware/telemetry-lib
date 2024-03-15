@@ -232,24 +232,23 @@ final class Metric {
 	 *  We also hash the result with manticore prefix as sha256
 	 */
 	protected static function getMachineId(string $osName): string {
-		return hash(
-			'sha256',
-			'manticore:' . (match ($osName) {
-				'Darwin' => exec('ioreg -rd1 -c IOPlatformExpertDevice'),
-				'Linux', 'Unix' => exec(
-					'( cat /var/lib/dbus/machine-id /etc/machine-id /etc/hostname '
-					. '2> /dev/null || hostname 2> /dev/null )'
-					. ' | head -n 1 || :'
-				),
-				'FreeBSD', 'NetBSD', 'OpenBSD' => exec(
-					'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
-				),
-				'WINNT', 'WIN32', 'Windows' => exec(
-					'%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid'
-				),
-				default => null,
-			} ?: 'unknown')
-		);
+		$machineId = match ($osName) {
+			'Darwin' => exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformSerialNumber/ {print $3}\''),
+			'Linux', 'Unix' => exec(
+				'( cat /var/lib/dbus/machine-id /etc/machine-id /etc/hostname '
+				. '2> /dev/null || hostname 2> /dev/null )'
+				. ' | head -n 1 || :'
+			),
+			'FreeBSD', 'NetBSD', 'OpenBSD' => exec(
+				'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
+			),
+			'WINNT', 'WIN32', 'Windows' => exec(
+				'%windir%\System32\REG.exe QUERY HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography /v MachineGuid'
+			),
+			default => '',
+		};
+
+		return $machineId ? hash('sha256', "manticore:$machineId") : 'unknown';
 	}
 
 	/**
