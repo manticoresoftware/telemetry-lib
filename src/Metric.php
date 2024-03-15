@@ -133,11 +133,16 @@ final class Metric {
 	}
 
 	/**
-	 * Return all set lables
-	 * @return array<int,Label>
+	 * Return all set labels
+	 * @return array<string,string>
 	 */
 	public function getLabels(): array {
-		return $this->labels;
+		return array_reduce(
+			$this->labels, function ($carry, $label) {
+				$carry[$label->getName()] = $label->getValue();
+				return $carry;
+			}, []
+		);
 	}
 
 	/**
