@@ -64,12 +64,12 @@ final class Metric {
 		$osName = php_uname('s');
 		$osRelease = static::parseOsReleaseFile();
 		$labels['os_name'] = $osName;
-		$lables['os_release_name'] = $osRelease['name'] ?? 'unknown';
-		$lables['os_release_version'] = $osRelease['version'] ?? 'unknown';
+		$labels['os_release_name'] = $osRelease['name'] ?? 'unknown';
+		$labels['os_release_version'] = $osRelease['version'] ?? 'unknown';
 		$labels['machine_type'] = php_uname('m');
 		$labels['machine_id'] = static::getMachineId($osName);
 		$labels['dockerized'] = static::isDockerized();
-		$lables['official_docker'] = static::isOfficialDocker();
+		$labels['official_docker'] = static::isOfficialDocker();
 		$labels['arch'] = static::getArchitecture();
 		// And finally add all labels
 		$this->addLabelList($labels);
@@ -110,7 +110,7 @@ final class Metric {
 	}
 
 	/**
-	 * Helper to update current set lables
+	 * Helper to update current set labels
 	 * @param  array<string,string>  $labels
 	 * @return static
 	 */
