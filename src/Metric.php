@@ -205,9 +205,11 @@ final class Metric {
 		$opts = [
 			'http' => [
 				'method'  => 'POST',
-				'header'  => "Content-Encoding: gzip\n"
-					. "Content-Type: application/x-www-form-urlencoded\n"
-			. 'Content-Length: '. strlen($content),
+				'header'  => [
+					'Content-Encoding: gzip',
+					'Content-Type: text/plain',
+					'Content-Length: ' . strlen($content),
+				],
 				'content' => $content,
 				'ignore_errors' => false,
 				'timeout' => static::REQUEST_TIMEOUT,
